@@ -40,7 +40,10 @@ else:
     
 def tulpa_tasks():
     papirus_phrases = input(f"Make Task For {TULPA_NAME}: ")
-    return Task(papirus_phrases=papirus_phrases)
+    description = {"papirus_phrases": papirus_phrases}
+    expected_output = {} 
+    return Task(description=description, expected_output=expected_output)
+
     
 def main():
     while True:
