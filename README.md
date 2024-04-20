@@ -6,7 +6,7 @@ A Tulpa is an intelligent being created through focused concentration and belief
 
 **Getting Started**
 
-TULPAMAKER comes as a pre-built application. You don't need to worry about installing Python or any other dependencies. Just download the TULPAMAKER executable file for your operating system and run it.
+Download the TULPAMAKER Script and install the required librarys
 
 **Creating your Tulpa**
 
