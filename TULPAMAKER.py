@@ -44,7 +44,7 @@ def tulpa_tasks():
     
 def main():
     while True:
-       choice = input("Select An Option (1 - TASKS /2 - EXIT): ")
+       choice = input("Select An Option (1 - TASKS / 2 - EXIT): ")
     
        if choice == "1" or "One" or "one":
             task = tulpa_tasks()
