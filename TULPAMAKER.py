@@ -104,12 +104,6 @@ def main(saved_tulpas):
 
         crew = Crew(agents=[TULPA], tasks=[], verbose=1)
 
-        google_api_key = os.getenv("GOOGLE_API_KEY")
-        if google_api_key:
-            os.environ["GOOGLE_API_KEY"] = google_api_key
-        else:
-            print("GOOGLE_API_KEY: NOT FOUND!")
-
         while True:
             choice = input("Select An Option (1 - TASKS / 2 - DELETE TULPA / 3 - EXIT): ")
 
