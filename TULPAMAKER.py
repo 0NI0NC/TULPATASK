@@ -39,7 +39,7 @@ else:
     print("GOOGLE_API_KEY: NOT FOUND!")
     
 def tulpa_tasks():
-    papirus_phrases = input(f"Make Task For {TULPA_NAME}")
+    papirus_phrases = input(f"Make Task For {TULPA_NAME}: ")
     return Task(papirus_phrases=papirus_phrases)
     
 def main():
