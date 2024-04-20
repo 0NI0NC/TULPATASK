@@ -26,11 +26,7 @@ TULPA = Agent(
     llm=llm
 )
 
-crew = Crew( 
-   agents=[TULPA],
-   tasks=[],
-   verbose=2
-)
+crew = Crew(agents=[TULPA], tasks=[], verbose=1)
 
 google_api_key = os.getenv("GOOGLE_API_KEY")
 if google_api_key:
@@ -40,24 +36,29 @@ else:
     
 def tulpa_tasks():
     papirus_phrases = input(f"Make Task For {TULPA_NAME}: ")
-    description = {"papirus_phrases": papirus_phrases}
-    expected_output = {} 
-    return Task(description=description, expected_output=expected_output)
+    description = papirus_phrases  
+    expected_output = "" 
+    task = Task(description=description, expected_output=expected_output)
+    task.agent = TULPA
+    return task
 
-    
+ 
 def main():
+    crew.agents.append(TULPA)
     while True:
-       choice = input("Select An Option (1 - TASKS / 2 - EXIT): ")
+        choice = input("Select An Option (1 - TASKS / 2 - EXIT): ")
     
-       if choice == "1" or "One" or "one":
+        if choice == "1" or choice.lower() == "one":
             task = tulpa_tasks()
-       elif choice == "2" or "Two" or "two":
+            crew.tasks.append(task)  
+        elif choice == "2" or choice.lower() == "two":
             print(f"{TULPA_NAME} Now Is Working...")
-         
-    result = crew.kickoff()
-    print(result)
-    print(f"{TULPA_NAME} Now Is Sleeping...")
+            break  
     
+    if TULPA is not None:  
+        crew.kickoff()  
+    
+    print(f"{TULPA_NAME} Now Is Sleeping...")
+
 if __name__ == "__main__":
    main()
-         
