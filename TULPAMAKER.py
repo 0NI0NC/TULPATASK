@@ -1,5 +1,5 @@
 from crewai import Agent, Task, Crew
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_community.llms import Ollama
 import os
 
 print("""                                                                                         
@@ -12,7 +12,7 @@ print("""
    ------------------------------------------------------------------------------------
 """)
 
-llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest")
+llm = Ollama(model="gemma:2b-instruct-v1.1-q2_K")
 
 def save_tulpa(tulpa_name, tulpa_description):
     with open("SAVE.txt", "a") as file:
@@ -40,17 +40,20 @@ def display_saved_tulpas(saved_tulpas):
     for i, tulpa in enumerate(saved_tulpas, 1):
         print(f"{i}. Name: {tulpa[0]}, Description: {tulpa[1]}")
 
-def delete_tulpa(saved_tulpas, index):
-    if index < 1 or index > len(saved_tulpas):
-        print("Invalid index.")
-        return saved_tulpas
-    else:
-        del saved_tulpas[index - 1]
-        with open("SAVE.txt", "w") as file:
-            for tulpa in saved_tulpas:
-                file.write(f"Tulpa Name: {tulpa[0]}\n")
-                file.write(f"Tulpa Description: {tulpa[1]}\n\n")
-        return saved_tulpas
+def delete_tulpa(saved_tulpas, number):
+    try:
+        index = int(number)
+        if 1 <= index <= len(saved_tulpas):
+            del saved_tulpas[index - 1]
+            with open("SAVE.txt", "w") as file:
+                for tulpa in saved_tulpas:
+                    file.write(f"Tulpa Name: {tulpa[0]}\n")
+                    file.write(f"Tulpa Description: {tulpa[1]}\n\n")
+        else:
+            print("Invalid number.")
+    except ValueError:
+        print("Invalid input. Please provide a valid number.")
+    return saved_tulpas
 
 def tulpa_tasks(tulpa):
     papirus_phrases = input(f"Make Task For {tulpa.role}: ")
@@ -77,10 +80,12 @@ def main(saved_tulpas):
     if len(saved_tulpas) >= 6:
         print("You have reached the limit of 6 saved tulpas.")
         return saved_tulpas
-
-    print("1. Create New Tulpa")
-    print("2. Load Saved Tulpas as Workers")
-    print("3. Exit")
+    
+    print(" ----------------------------------")
+    print("-  1. Create New Tulpa             -")
+    print("-  2. Load Saved Tulpas as Workers -")
+    print("-  3. Exit                         -")
+    print(" ----------------------------------")
     choice = input("Select an option: ")
 
     if choice == "1":
@@ -113,7 +118,7 @@ def main(saved_tulpas):
                 crew.tasks.append(task)
             elif choice == "2" or choice.lower() == "two":
                 display_saved_tulpas(saved_tulpas)
-                index = int(input("Enter the index of the tulpa to delete: "))
+                index = int(input("Enter the number of the tulpa to delete: "))
                 saved_tulpas = delete_tulpa(saved_tulpas, index)
             elif choice == "3" or choice.lower() == "three":
                 print(f"{TULPA_NAME} Now Is Working...")
@@ -138,12 +143,6 @@ def main(saved_tulpas):
             )
             agents.append(tulpa)
         crew = Crew(agents=agents, tasks=[], verbose=1)
-
-        google_api_key = os.getenv("GOOGLE_API_KEY")
-        if google_api_key:
-            os.environ["GOOGLE_API_KEY"] = google_api_key
-        else:
-            print("GOOGLE_API_KEY: NOT FOUND!")
 
         while True:
             choice = input("Select An Option (1 - TASKS / 2 - DELETE TULPA / 3 - EXIT): ")
