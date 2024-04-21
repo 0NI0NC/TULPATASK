@@ -16,7 +16,7 @@ print("""
                                                                                                       
 """)
 
-llm = Ollama(model="qwen:0.5b-chat-v1.5-q2_K")
+llm = Ollama(model="gemma:2b-v1.1")
 
 def save_tulpa(tulpa_name, tulpa_description):
     with open("SAVE.txt", "a") as file:
