@@ -68,6 +68,17 @@ def delete_tulpa(saved_tulpas, number):
         print("Invalid input. Please provide a valid number.")
     return saved_tulpas
 
+def select_tulpa(agents):
+    print("Select a tulpa to assign the task:")
+    for i, tulpa in enumerate(agents, 1):
+        print(f"{i}. {tulpa.role}")
+    choice = int(input("Enter the number of the tulpa: "))
+    if 1 <= choice <= len(agents):
+        return agents[choice - 1]
+    else:
+        print("Invalid choice.")
+        return None
+
 def tulpa_tasks(tulpa):
     papirus_phrases = input(f"Make Task For {tulpa.role}: ")
     description = papirus_phrases
