@@ -12,7 +12,9 @@ print("""
    ------------------------------------------------------------------------------------
 """)
 
-llm = Ollama(model="gemma:2b-instruct-v1.1-q2_K")
+model = input("Choose The Model (OLLAMA): ")
+
+llm = Ollama(model)
 
 def save_tulpa(tulpa_name, tulpa_description):
     with open("SAVE.txt", "a") as file:
