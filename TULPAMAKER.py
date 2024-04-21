@@ -15,30 +15,80 @@ print("""
 def download_model(model):
     os.system(f"ollama pull {model}")
 
-def choose_model():
-    model = input("Choose The Model (OLLAMA): ")
-    return model
+model = input("Choose The Model (OLLAMA): ")
 
-def save_model(model):
-    with open("model.txt", "w") as file:
-        file.write(model)
+llm = Ollama()
 
-def load_model():
+def save_tulpa(tulpa_name, tulpa_description):
+    with open("SAVE.txt", "a") as file:
+        file.write(f"Tulpa Name: {tulpa_name}\n")
+        file.write(f"Tulpa Description: {tulpa_description}\n\n")
+
+def load_saved_tulpas():
+    saved_tulpas = []
     try:
-        with open("model.txt", "r") as file:
-            model = file.read().strip()
+        with open("SAVE.txt", "r") as file:
+            lines = file.readlines()
+            for i in range(0, len(lines), 4):
+                if i + 1 < len(lines):
+                    name = lines[i].split(": ")[1].strip()
+                    description = lines[i + 1].split(": ")[1].strip()
+                    saved_tulpas.append((name, description))
+                else:
+                    print("Invalid format in SAVE.txt file.")
     except FileNotFoundError:
-        model = None
-    return model
+        print("No saved tulpas found.")
+    return saved_tulpas
 
-def model_exists(model):
+def display_saved_tulpas(saved_tulpas):
+    print("Saved Tulpas:")
+    for i, tulpa in enumerate(saved_tulpas, 1):
+        print(f"{i}. Name: {tulpa[0]}, Description: {tulpa[1]}")
+
+def delete_tulpa(saved_tulpas, number):
+    try:
+        index = int(number)
+        if 1 <= index <= len(saved_tulpas):
+            del saved_tulpas[index - 1]
+            with open("SAVE.txt", "w") as file:
+                for tulpa in saved_tulpas:
+                    file.write(f"Tulpa Name: {tulpa[0]}\n")
+                    file.write(f"Tulpa Description: {tulpa[1]}\n\n")
+        else:
+            print("Invalid number.")
+    except ValueError:
+        print("Invalid input. Please provide a valid number.")
+    return saved_tulpas
+
+def tulpa_tasks(tulpa):
+    papirus_phrases = input(f"Make Task For {tulpa.role}: ")
+    description = papirus_phrases
+    expected_output = ""
+    task = Task(description=description, expected_output=expected_output)
+    task.agent = tulpa
+    return task
+
+def load_tulpa(saved_tulpas):
+    print("Select the number of tulpas to load as workers:")
+    display_saved_tulpas(saved_tulpas)
+    num_tulpas = int(input("Enter the number of tulpas to load: "))
+    loaded_tulpas = []
+    for i in range(num_tulpas):
+        index = i + 1
+        if 1 <= index <= len(saved_tulpas):
+            loaded_tulpas.append(saved_tulpas[index - 1])
+        else:
+            print(f"Invalid index: {index}")
+    return loaded_tulpas
+
+def main(saved_tulpas):
+    model_exists = False
     for file in os.listdir():
         if file.startswith(model):
-            return True
-    return False
-
-def main(saved_tulpas, model):
-    if not model_exists(model):
+            model_exists = True
+            break
+    
+    if not model_exists:
         print("Model not found. Downloading...")
         download_model(model)
     else:
@@ -66,7 +116,7 @@ def main(saved_tulpas, model):
             backstory=PAPIRUS,
             allow_delegation=False,
             verbose=True,
-            llm=Ollama()
+            llm=llm
         )
 
         crew = Crew(agents=[TULPA], tasks=[], verbose=1)
@@ -100,7 +150,7 @@ def main(saved_tulpas, model):
                 backstory=tulpa_description,
                 allow_delegation=False,
                 verbose=True,
-                llm=Ollama()
+                llm=llm
             )
             agents.append(tulpa)
         crew = Crew(agents=agents, tasks=[], verbose=1)
@@ -133,6 +183,4 @@ def main(saved_tulpas, model):
 
 if __name__ == "__main__":
     saved_tulpas = load_saved_tulpas()
-    model = choose_model()
-    save_model(model)
-    saved_tulpas = main(saved_tulpas, model)
+    saved_tulpas = main(saved_tulpas)
