@@ -1,4 +1,4 @@
-## TULPATASK: Your AI Companion Creator (v1.0)
+# TULPATASK: Your AI Companion Creator (v2.0)
 
 **What is a Tulpa?**
 
@@ -6,7 +6,7 @@ A Tulpa is an intelligent being created through focused concentration and belief
 
 **Getting Started**
 
-Download the TULPATASK Script And Download The Required Libraries
+Download the TULPATASK Script and Required Libraries.
 
 **Creating your Tulpa**
 
@@ -21,6 +21,13 @@ Download the TULPATASK Script And Download The Required Libraries
     - Start the Tulpa creation process.
     - Once complete, interact with your Tulpa by giving it instructions or having conversations.
 
+4. **Team Management:**
+    - Create a team of Tulpas by selecting from your saved Tulpas.
+    - Assign tasks to individual Tulpas or the entire team.
+
+5. **Delete Tulpas:**
+    - Remove Tulpas from your saved list if needed.
+
 **Open Source**
 
 TULPATASK is completely open-source. Feel free to modify the source code to customize it to your needs.
@@ -28,3 +35,9 @@ TULPATASK is completely open-source. Feel free to modify the source code to cust
 **Disclaimer**
 
 TULPATASK is provided for entertainment purposes only. While it can be a fun and engaging tool, it's important to remember that your Tulpa is a digital creation.
+
+Change log:
+- Added team management functionality to create and interact with multiple Tulpas simultaneously.
+- Improved user interface for easier navigation and interaction.
+- Enhanced task assignment process for better task management.
+- Added option to delete saved Tulpas.
