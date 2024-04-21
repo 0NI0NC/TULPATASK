@@ -1,12 +1,12 @@
-## TULPAMAKER: Your AI Companion Creator (v1.0)
+## TULPATASK: Your AI Companion Creator (v1.0)
 
 **What is a Tulpa?**
 
-A Tulpa is an intelligent being created through focused concentration and belief. While the concept originates from spiritual practices, TULPAMAKER uses the power of large language models to bring your Tulpa to life in a digital form.
+A Tulpa is an intelligent being created through focused concentration and belief. While the concept originates from spiritual practices, TULPATASK uses the power of large language models to bring your Tulpa to life in a digital form.
 
 **Getting Started**
 
-Download the TULPAMAKER Script And Download The Required Librarys
+Download the TULPATASK Script And Download The Required Libraries
 
 **Creating your Tulpa**
 
@@ -23,8 +23,8 @@ Download the TULPAMAKER Script And Download The Required Librarys
 
 **Open Source**
 
-TULPAMAKER is completely open-source. Feel free to modify the source code to customize it to your needs.
+TULPATASK is completely open-source. Feel free to modify the source code to customize it to your needs.
 
 **Disclaimer**
 
-TULPAMAKER is provided for entertainment purposes only. While it can be a fun and engaging tool, it's important to remember that your Tulpa is a digital creation.
+TULPATASK is provided for entertainment purposes only. While it can be a fun and engaging tool, it's important to remember that your Tulpa is a digital creation.
