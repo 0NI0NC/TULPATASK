@@ -3,21 +3,20 @@ from langchain_community.llms import Ollama
 import os
 
 print("""                                             
- _______ _   _ _    _____  _____  __  __  _____  _  _ ______ _____  
-(__ _ __)(_)  (_)(_)   (_____) (_____) (__)_(__) (_____) (_) (_)(______)(_____) 
-  (_)  (_)  (_)(_)   (_)__(_)(_)___(_)(_) (_) (_)(_)___(_)(_)_(_) (_)__  (_)__(_)
-  (_)  (_)  (_)(_)   (_____) (_______)(_) (_) (_)(_______)(____) (____) (_____) 
-  (_)  (_)___(_)(_)____ (_)   (_)  (_)(_)   (_)(_)  (_)(_) (_) (_)____ ( ) ( ) 
-  (_)  (_____) (______)(_)   (_)  (_)(_)   (_)(_)  (_)(_) (_)(______)(_) (_)
-  ------------------------------------------------------------------------------------
+
+ /$$$$$$$$ /$$   /$$ /$$       /$$$$$$$   /$$$$$$  /$$      /$$  /$$$$$$  /$$   /$$ /$$$$$$$$ /$$$$$$$ 
+|__  $$__/| $$  | $$| $$      | $$__  $$ /$$__  $$| $$$    /$$$ /$$__  $$| $$  /$$/| $$_____/| $$__  $$
+   | $$   | $$  | $$| $$      | $$  \ $$| $$  \ $$| $$$$  /$$$$| $$  \ $$| $$ /$$/ | $$      | $$  \ $$
+   | $$   | $$  | $$| $$      | $$$$$$$/| $$$$$$$$| $$ $$/$$ $$| $$$$$$$$| $$$$$/  | $$$$$   | $$$$$$$/
+   | $$   | $$  | $$| $$      | $$____/ | $$__  $$| $$  $$$| $$| $$__  $$| $$  $$  | $$__/   | $$__  $$
+   | $$   | $$  | $$| $$      | $$      | $$  | $$| $$\  $ | $$| $$  | $$| $$\  $$ | $$      | $$  \ $$
+   | $$   |  $$$$$$/| $$$$$$$$| $$      | $$  | $$| $$ \/  | $$| $$  | $$| $$ \  $$| $$$$$$$$| $$  | $$
+   |__/    \______/ |________/|__/      |__/  |__/|__/     |__/|__/  |__/|__/  \__/|________/|__/  |__/
+                                                                                                                                                                                                            
+                                                                                                      
 """)
 
-def download_model(model):
-    os.system(f"ollama pull {model}")
-
-model = input("Choose The Model (OLLAMA): ")
-
-llm = Ollama()
+llm = Ollama(model="qwen:0.5b-chat-v1.5-q2_K")
 
 def save_tulpa(tulpa_name, tulpa_description):
     with open("SAVE.txt", "a") as file:
@@ -82,18 +81,6 @@ def load_tulpa(saved_tulpas):
     return loaded_tulpas
 
 def main(saved_tulpas):
-    model_exists = False
-    for file in os.listdir():
-        if file.startswith(model):
-            model_exists = True
-            break
-    
-    if not model_exists:
-        print("Model not found. Downloading...")
-        download_model(model)
-    else:
-        print("Model already exists.")
-    
     if len(saved_tulpas) >= 6:
         print("You have reached the limit of 6 saved tulpas.")
         return saved_tulpas
