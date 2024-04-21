@@ -6,7 +6,7 @@ A Tulpa is an intelligent being created through focused concentration and belief
 
 **Getting Started**
 
-Download the TULPAMAKER Script and install the required librarys
+Download the TULPAMAKER Release
 
 **Creating your Tulpa**
 
