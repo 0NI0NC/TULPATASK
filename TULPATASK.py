@@ -32,13 +32,18 @@ def load_saved_tulpas():
     try:
         with open("SAVE.txt", "r") as file:
             lines = file.readlines()
-            for i in range(0, len(lines), 4):
-                if i + 1 < len(lines):
-                    name = lines[i].split(": ")[1].strip()
-                    description = lines[i + 1].split(": ")[1].strip()
-                    saved_tulpas.append((name, description))
-                else:
-                    print("Invalid format in SAVE.txt file.")
+            tulpa_name = None
+            tulpa_description = None
+            for line in lines:
+                line = line.strip()
+                if line.startswith("Tulpa Name:"):
+                    if tulpa_name and tulpa_description:
+                        saved_tulpas.append((tulpa_name, tulpa_description))
+                    tulpa_name = line.split(": ")[1].strip()
+                elif line.startswith("Tulpa Description:"):
+                    tulpa_description = line.split(": ")[1].strip()
+            if tulpa_name and tulpa_description:
+                saved_tulpas.append((tulpa_name, tulpa_description))
     except FileNotFoundError:
         print("No saved tulpas found.")
     return saved_tulpas
@@ -72,16 +77,16 @@ def tulpa_tasks(tulpa):
     return task
 
 def load_tulpa(saved_tulpas):
-    print("Select the number of tulpas to load as workers:")
+    print("Select the number of tulpas to load as team members:")
     display_saved_tulpas(saved_tulpas)
     num_tulpas = int(input("Enter the number of tulpas to load: "))
     loaded_tulpas = []
-    for i in range(num_tulpas):
-        index = i + 1
-        if 1 <= index <= len(saved_tulpas):
-            loaded_tulpas.append(saved_tulpas[index - 1])
+    for _ in range(num_tulpas):
+        index = int(input("Enter the number of tulpas to load: ")) - 1
+        if 0 <= index < len(saved_tulpas):
+            loaded_tulpas.append(saved_tulpas[index])
         else:
-            print(f"Invalid index: {index}")
+            print(f"Invalid index: {index + 1}")
     return loaded_tulpas
 
 def main(saved_tulpas):
@@ -91,8 +96,8 @@ def main(saved_tulpas):
     
     print(" ----------------------------------")
     print("-  1. Create New Tulpa             -")
-    print("-  2. Load Saved Tulpas as Workers -")
-    print("-  3. Exit                         -")
+    print("-  2. Load Saved Tulpas as Team     -")
+    print("-  3. Exit                          -")
     print(" ----------------------------------")
     choice = input("Select an option: ")
 
@@ -109,6 +114,8 @@ def main(saved_tulpas):
             verbose=True,
             llm=llm
         )
+        
+        saved_tulpas.append((TULPA_NAME, PAPIRUS))
 
         crew = Crew(agents=[TULPA], tasks=[], verbose=1)
 
@@ -158,12 +165,12 @@ def main(saved_tulpas):
                 index = int(input("Enter the number of the tulpa to delete: "))
                 saved_tulpas = delete_tulpa(saved_tulpas, index)
             elif choice == "3" or choice.lower() == "three":
-                print("Tulpas are now working...")
+                print("Tulpa Team is now working...")
                 break
 
         crew.kickoff()
 
-        print("Tulpas are now sleeping...")
+        print("Tulpa Team is now sleeping...")
         
     elif choice == "3":
         pass
