@@ -121,7 +121,7 @@ def main(saved_tulpas):
             role=TULPA_NAME,
             goal=f"{TULPA_NAME} knows and will follow whatever his owner wants, because, {TULPA_NAME} Is An Tulpa Companion Of Owner",
             backstory=PAPIRUS,
-            allow_delegation=False,
+            allow_delegation=True,
             verbose=True,
             llm=llm
         )
