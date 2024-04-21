@@ -164,7 +164,7 @@ def main(saved_tulpas):
                     crew.tasks.append(task)
             elif choice == "2" or choice.lower() == "two":
                 display_saved_tulpas(saved_tulpas)
-                index = int(input("Enter the index of the tulpa to delete: "))
+                index = int(input("Enter the number of the tulpa to delete: "))
                 saved_tulpas = delete_tulpa(saved_tulpas, index)
             elif choice == "3" or choice.lower() == "three":
                 print("Tulpas are now working...")
