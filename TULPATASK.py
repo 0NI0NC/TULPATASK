@@ -162,6 +162,28 @@ def main(saved_tulpas):
                 llm=llm
             )
             agents.append(tulpa)
+        
+        print("Select tulpas to include in the team:")
+        display_saved_tulpas(saved_tulpas)
+        while True:
+            choice = input("Enter the number of the tulpa to include in the team (0 to finish): ")
+            if choice == "0":
+                break
+            index = int(choice) - 1
+            if 0 <= index < len(saved_tulpas):
+                tulpa_name, tulpa_description = saved_tulpas[index]
+                tulpa = Agent(
+                    role=tulpa_name,
+                    goal=f"{tulpa_name} knows and will follow whatever his owner wants, because, {tulpa_name} Is An Tulpa Companion Of Owner",
+                    backstory=tulpa_description,
+                    allow_delegation=False,
+                    verbose=True,
+                    llm=llm
+                )
+                agents.append(tulpa)
+            else:
+                print(f"Invalid index: {index + 1}")
+
         crew = Crew(agents=agents, tasks=[], verbose=1)
 
         while True:
