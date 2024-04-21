@@ -1,4 +1,4 @@
-# TULPATASK: Your AI Companion Creator (v2.0)
+# TULPATASK: Your AI Companion Creator (v2.0.0)
 
 **What is a Tulpa?**
 
@@ -6,7 +6,7 @@ A Tulpa is an intelligent being created through focused concentration and belief
 
 **Getting Started**
 
-Download the TULPATASK Script and Required Libraries.
+Download the TULPATASK Release and runs on Terminal
 
 **Creating your Tulpa**
 
