@@ -101,7 +101,11 @@ def load_tulpa(saved_tulpas):
     return loaded_tulpas
 
 def main(saved_tulpas):
-    if len(saved_tulpas) >= 6:
+    MAX_TULPAS_LIMIT = 6
+
+    tulpas_limit = min(MAX_TULPAS_LIMIT, len(saved_tulpas))
+
+    if len(saved_tulpas) >= MAX_TULPAS_LIMIT:
         print("You have reached the limit of 6 saved tulpas.")
         return saved_tulpas
     
