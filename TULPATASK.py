@@ -1,5 +1,6 @@
 from crewai import Agent, Task, Crew
-from langchain_community.llms import Ollama
+from langchain_google_genai import ChatGoogleGenerativeAI
+import getpass
 import os
 
 print("""                                             
@@ -16,7 +17,10 @@ print("""
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
 """)
 
-llm = Ollama(model="gemma:2b-v1.1")
+llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest")
+
+if "GOOGLE_API_KEY" not in os.environ:
+    os.environ["GOOGLE_API_KEY"] = getpass.getpass("GOOGLE_API_KEY: NOT FOUND")
 
 def save_tulpa(tulpa_name, tulpa_description):
     with open("SAVE.txt", "a") as file:
