@@ -68,16 +68,21 @@ def delete_tulpa(saved_tulpas, number):
         print("Invalid input. Please provide a valid number.")
     return saved_tulpas
 
-def select_tulpa(agents):
-    print("Select a tulpa to assign the task:")
-    for i, tulpa in enumerate(agents, 1):
-        print(f"{i}. {tulpa.role}")
-    choice = int(input("Enter the number of the tulpa: "))
-    if 1 <= choice <= len(agents):
-        return agents[choice - 1]
-    else:
-        print("Invalid choice.")
-        return None
+def select_tulpa(saved_tulpas):
+    print("Select tulpas to include in the team:")
+    display_saved_tulpas(saved_tulpas)
+    selected_tulpas = []
+    while True:
+        choice = input("Enter the number of the tulpa to include in the team (0 to finish): ")
+        if choice == "0":
+            break
+        index = int(choice) - 1
+        if 0 <= index < len(saved_tulpas):
+            tulpa_name, tulpa_description = saved_tulpas[index]
+            selected_tulpas.append((tulpa_name, tulpa_description))
+        else:
+            print(f"Invalid index: {index + 1}")
+    return selected_tulpas
 
 def tulpa_tasks(tulpa):
     papirus_phrases = input(f"Make Task For {tulpa.role}: ")
@@ -86,19 +91,6 @@ def tulpa_tasks(tulpa):
     task = Task(description=description, expected_output=expected_output)
     task.agent = tulpa
     return task
-
-def load_tulpa(saved_tulpas):
-    print("Select the number of tulpas to load as team members:")
-    display_saved_tulpas(saved_tulpas)
-    num_tulpas = int(input("Enter the number of tulpas to load: "))
-    loaded_tulpas = []
-    for _ in range(num_tulpas):
-        index = int(input("Enter the number of tulpas to load: ")) - 1
-        if 0 <= index < len(saved_tulpas):
-            loaded_tulpas.append(saved_tulpas[index])
-        else:
-            print(f"Invalid index: {index + 1}")
-    return loaded_tulpas
 
 def main(saved_tulpas):
     MAX_TULPAS_LIMIT = 6
@@ -154,9 +146,9 @@ def main(saved_tulpas):
         print(f"{TULPA_NAME} Now Is Sleeping...")
 
     elif choice == "2":
-        loaded_tulpas = load_tulpa(saved_tulpas)
+        selected_tulpas = select_tulpa(saved_tulpas)
         agents = []
-        for tulpa_name, tulpa_description in loaded_tulpas:
+        for tulpa_name, tulpa_description in selected_tulpas:
             tulpa = Agent(
                 role=tulpa_name,
                 goal=f"{tulpa_name} knows and will follow whatever his owner wants, because, {tulpa_name} Is An Tulpa Companion Of Owner",
@@ -166,27 +158,6 @@ def main(saved_tulpas):
                 llm=llm
             )
             agents.append(tulpa)
-        
-        print("Select tulpas to include in the team:")
-        display_saved_tulpas(saved_tulpas)
-        while True:
-            choice = input("Enter the number of the tulpa to include in the team (0 to finish): ")
-            if choice == "0":
-                break
-            index = int(choice) - 1
-            if 0 <= index < len(saved_tulpas):
-                tulpa_name, tulpa_description = saved_tulpas[index]
-                tulpa = Agent(
-                    role=tulpa_name,
-                    goal=f"{tulpa_name} knows and will follow whatever his owner wants, because, {tulpa_name} Is An Tulpa Companion Of Owner",
-                    backstory=tulpa_description,
-                    allow_delegation=False,
-                    verbose=True,
-                    llm=llm
-                )
-                agents.append(tulpa)
-            else:
-                print(f"Invalid index: {index + 1}")
 
         crew = Crew(agents=agents, tasks=[], verbose=1)
 
