@@ -28,7 +28,3 @@ TULPAMAKER is completely open-source. Feel free to modify the source code to cus
 **Disclaimer**
 
 TULPAMAKER is provided for entertainment purposes only. While it can be a fun and engaging tool, it's important to remember that your Tulpa is a digital creation.
-
-**Important Note:**
-
-This pre-built version uses a specific large language model (LLM) called "gemma:2b-instruct-v1.1-q2_Kb". While the core functionality remains the same, modifying the source code allows you to explore compatibility with other LLMs.
