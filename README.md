@@ -6,7 +6,7 @@ A Tulpa is an intelligent being created through focused concentration and belief
 
 **Getting Started**
 
-Download the TULPATASK Script and install required librarys
+Download the TULPATASK Executable for linux and execute by terminal
 
 **Creating your Tulpa**
 
