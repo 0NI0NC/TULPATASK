@@ -106,7 +106,7 @@ def main(saved_tulpas):
         return saved_tulpas
     
     print(" ----------------------------------")
-    print("-  1. Create New Tulpa             -")
+    print("-  1. Create New Tulpa              -")
     print("-  2. Load Saved Tulpas as Team     -")
     print("-  3. Exit                          -")
     print(" ----------------------------------")
