@@ -1,34 +1,7 @@
 from crewai import Agent, Task, Crew
-from crewai_tools import DirectoryReadTool, FileReadTool, FileWriteTool, BaseTool
-from langchain_community.llms import Ollama
+from langchain_google_genai import ChatGoogleGenerativeAI
 import getpass
 import os
-
-class FileCreateTool(BaseTool):
-    name: str = "File Create Tool"
-    description: str = "A tool to create a file with specified content."
-
-    def _run(self, file_path_content: dict) -> str:
-        file_path = file_path_content.get("file_path")
-        content = file_path_content.get("content")
-
-        try:
-            with open(file_path, "w") as file:
-                file.write(content)
-            return "File created successfully."
-        except Exception as e:
-            return f"Error creating file: {str(e)}"
-
-class DirectoryCreateTool(BaseTool):
-    name: str = "Directory Create Tool"
-    description: str = "A tool to create a directory."
-
-    def _run(self, directory_path: str) -> str:
-        try:
-            os.makedirs(directory_path, exist_ok=True)
-            return "Directory created successfully."
-        except Exception as e:
-            return f"Error creating directory: {str(e)}"
 
 print("""                                             
 
@@ -44,16 +17,67 @@ print("""
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
 """)
 
-llm = Ollama(model="llama3")
+llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest")
 
 if "GOOGLE_API_KEY" not in os.environ:
     os.environ["GOOGLE_API_KEY"] = getpass.getpass("GOOGLE_API_KEY: NOT FOUND")
 
-docs_tool = DirectoryReadTool(directory='./data')
-file_read_tool = FileReadTool()
-file_write_tool = FileWriteTool()
-create_file_tool = FileCreateTool()
-create_dir_tool = DirectoryCreateTool()
+def save_tulpa(tulpa_name, tulpa_description):
+    with open("SAVE.txt", "a") as file:
+        file.write(f"Tulpa Name: {tulpa_name}\n")
+        file.write(f"Tulpa Description: {tulpa_description}\n\n")
+
+def load_saved_tulpas():
+    saved_tulpas = []
+    try:
+        with open("SAVE.txt", "r") as file:
+            lines = file.readlines()
+            tulpa_name = None
+            tulpa_description = None
+            for line in lines:
+                line = line.strip()
+                if line.startswith("Tulpa Name:"):
+                    if tulpa_name and tulpa_description:
+                        saved_tulpas.append((tulpa_name, tulpa_description))
+                    tulpa_name = line.split(": ")[1].strip()
+                elif line.startswith("Tulpa Description:"):
+                    tulpa_description = line.split(": ")[1].strip()
+            if tulpa_name and tulpa_description:
+                saved_tulpas.append((tulpa_name, tulpa_description))
+    except FileNotFoundError:
+        print("No saved tulpas found.")
+    return saved_tulpas
+
+def display_saved_tulpas(saved_tulpas):
+    print("Saved Tulpas:")
+    for i, tulpa in enumerate(saved_tulpas, 1):
+        print(f"{i}. Name: {tulpa[0]}, Description: {tulpa[1]}")
+
+def delete_tulpa(saved_tulpas, number):
+    try:
+        index = int(number)
+        if 1 <= index <= len(saved_tulpas):
+            del saved_tulpas[index - 1]
+            with open("SAVE.txt", "w") as file:
+                for tulpa in saved_tulpas:
+                    file.write(f"Tulpa Name: {tulpa[0]}\n")
+                    file.write(f"Tulpa Description: {tulpa[1]}\n\n")
+        else:
+            print("Invalid number.")
+    except ValueError:
+        print("Invalid input. Please provide a valid number.")
+    return saved_tulpas
+
+def select_tulpa(agents):
+    print("Select a tulpa to assign the task:")
+    for i, tulpa in enumerate(agents, 1):
+        print(f"{i}. {tulpa.role}")
+    choice = int(input("Enter the number of the tulpa: "))
+    if 1 <= choice <= len(agents):
+        return agents[choice - 1]
+    else:
+        print("Invalid choice.")
+        return None
 
 def tulpa_tasks(tulpa):
     papirus_phrases = input(f"Make Task For {tulpa.role}: ")
@@ -61,33 +85,28 @@ def tulpa_tasks(tulpa):
     expected_output = ""
     task = Task(description=description, expected_output=expected_output)
     task.agent = tulpa
-
-    directory = "data"  
-    file_name = input("Enter the name of the file (e.g., CALC.py): ")
-    file_path = os.path.join(directory, file_name)  
-
-    content = input("Enter the content for the file: ")
-
-    task.tools[create_file_tool] = {"file_path": file_path, "content": content}
-
-    directory_name = input("Enter the name of the directory: ")
-    directory_path = os.path.join(directory, directory_name)
-
-    task.tools[create_dir_tool] = {"directory_path": directory_path}
-
     return task
 
+def load_tulpa(saved_tulpas):
+    print("Select the number of tulpas to load as team members:")
+    display_saved_tulpas(saved_tulpas)
+    num_tulpas = int(input("Enter the number of tulpas to load: "))
+    loaded_tulpas = []
+    for _ in range(num_tulpas):
+        index = int(input("Enter the number of tulpas to load: ")) - 1
+        if 0 <= index < len(saved_tulpas):
+            loaded_tulpas.append(saved_tulpas[index])
+        else:
+            print(f"Invalid index: {index + 1}")
+    return loaded_tulpas
+
 def main(saved_tulpas):
-    MAX_TULPAS_LIMIT = 6
-
-    tulpas_limit = min(MAX_TULPAS_LIMIT, len(saved_tulpas))
-
-    if len(saved_tulpas) >= MAX_TULPAS_LIMIT:
+    if len(saved_tulpas) >= 6:
         print("You have reached the limit of 6 saved tulpas.")
         return saved_tulpas
     
     print(" ----------------------------------")
-    print("-  1. Create New Tulpa              -")
+    print("-  1. Create New Tulpa             -")
     print("-  2. Load Saved Tulpas as Team     -")
     print("-  3. Exit                          -")
     print(" ----------------------------------")
@@ -96,6 +115,7 @@ def main(saved_tulpas):
     if choice == "1":
         TULPA_NAME = input("Choose Name For Tulpa: ")
         PAPIRUS = input("Create Your Tulpa Description: ")
+        save_tulpa(TULPA_NAME, PAPIRUS)
 
         TULPA = Agent(
             role=TULPA_NAME,
@@ -103,9 +123,7 @@ def main(saved_tulpas):
             backstory=PAPIRUS,
             allow_delegation=True,
             verbose=True,
-            llm=llm,
-            memory=True,
-            tools=[docs_tool, file_read_tool, file_write_tool, create_file_tool, create_dir_tool],
+            llm=llm
         )
         
         saved_tulpas.append((TULPA_NAME, PAPIRUS))
@@ -132,20 +150,39 @@ def main(saved_tulpas):
         print(f"{TULPA_NAME} Now Is Sleeping...")
 
     elif choice == "2":
-        selected_tulpas = select_tulpa(saved_tulpas)
+        loaded_tulpas = load_tulpa(saved_tulpas)
         agents = []
-        for tulpa_name, tulpa_description in selected_tulpas:
+        for tulpa_name, tulpa_description in loaded_tulpas:
             tulpa = Agent(
                 role=tulpa_name,
                 goal=f"{tulpa_name} knows and will follow whatever his owner wants, because, {tulpa_name} Is An Tulpa Companion Of Owner",
                 backstory=tulpa_description,
-                allow_delegation=True,
+                allow_delegation=False,
                 verbose=True,
-                llm=llm,
-                memory=True,
-                tools=[docs_tool, file_read_tool, file_write_tool, create_file_tool, create_dir_tool],
+                llm=llm
             )
             agents.append(tulpa)
+        
+        print("Select tulpas to include in the team:")
+        display_saved_tulpas(saved_tulpas)
+        while True:
+            choice = input("Enter the number of the tulpa to include in the team (0 to finish): ")
+            if choice == "0":
+                break
+            index = int(choice) - 1
+            if 0 <= index < len(saved_tulpas):
+                tulpa_name, tulpa_description = saved_tulpas[index]
+                tulpa = Agent(
+                    role=tulpa_name,
+                    goal=f"{tulpa_name} knows and will follow whatever his owner wants, because, {tulpa_name} Is An Tulpa Companion Of Owner",
+                    backstory=tulpa_description,
+                    allow_delegation=True,
+                    verbose=True,
+                    llm=llm
+                )
+                agents.append(tulpa)
+            else:
+                print(f"Invalid index: {index + 1}")
 
         crew = Crew(agents=agents, tasks=[], verbose=1)
 
