@@ -1,4 +1,5 @@
 from crewai import Agent, Task, Crew
+from crewai_tools import FileReadTool, DirectoryReadTool, BaseTool
 from langchain_google_genai import ChatGoogleGenerativeAI
 import getpass
 import os
@@ -17,7 +18,39 @@ print("""
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
 """)
 
+class FileReadTool:
+    def __init__(self):
+        pass
+
+    def read_file(self, file_path):
+        try:
+            with open(file_path, 'r') as file:
+                content = file.read()
+                return content
+        except FileNotFoundError:
+            with open(file_path, 'w') as file:
+                file.write("")
+            return f"File '{file_path}' created."
+        except Exception as e:
+            return str(e)
+
+class FileWriteTool(BaseTool):
+    name: str = "File Write Tool"
+    description: str = "A tool for writing content to a file."
+
+    def _run(self, file_path: str, content: str) -> str:
+        try:
+            with open(file_path, 'w') as file:
+                file.write(content)
+            return f"Content successfully written to file '{file_path}'."
+        except Exception as e:
+            return f"Error writing to file '{file_path}': {str(e)}"
+
 llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest")
+file_read_tool = FileReadTool()
+directory_read_tool = DirectoryReadTool()
+file_write_tool = FileWriteTool()
+
 
 if "GOOGLE_API_KEY" not in os.environ:
     os.environ["GOOGLE_API_KEY"] = getpass.getpass("GOOGLE_API_KEY: NOT FOUND")
@@ -95,7 +128,19 @@ def load_tulpa(saved_tulpas):
     for _ in range(num_tulpas):
         index = int(input("Enter the number of tulpas to load: ")) - 1
         if 0 <= index < len(saved_tulpas):
-            loaded_tulpas.append(saved_tulpas[index])
+            loaded_tulpa = saved_tulpas[index]
+            tulpa_name, tulpa_description = loaded_tulpa
+            tulpa = Agent(
+                role=tulpa_name,
+                goal=f"{tulpa_name} knows and will follow whatever his owner wants, because, {tulpa_name} Is An Tulpa Companion Of Owner",
+                backstory=tulpa_description,
+                allow_delegation=False,
+                verbose=True,
+                memory=True,
+                tools=[file_read_tool, directory_read_tool, file_write_tool],  
+                llm=llm
+            )
+            loaded_tulpas.append(tulpa)
         else:
             print(f"Invalid index: {index + 1}")
     return loaded_tulpas
@@ -123,6 +168,8 @@ def main(saved_tulpas):
             backstory=PAPIRUS,
             allow_delegation=True,
             verbose=True,
+            memory=True,
+            tools=[file_read_tool, directory_read_tool, file_write_tool],
             llm=llm
         )
         
@@ -159,6 +206,8 @@ def main(saved_tulpas):
                 backstory=tulpa_description,
                 allow_delegation=False,
                 verbose=True,
+                memory=True,
+                tools=[file_read_tool, directory_read_tool, file_write_tool],
                 llm=llm
             )
             agents.append(tulpa)
@@ -176,8 +225,10 @@ def main(saved_tulpas):
                     role=tulpa_name,
                     goal=f"{tulpa_name} knows and will follow whatever his owner wants, because, {tulpa_name} Is An Tulpa Companion Of Owner",
                     backstory=tulpa_description,
-                    allow_delegation=False,
+                    allow_delegation=True,
                     verbose=True,
+                    memory=True,
+                    tools=[file_read_tool, directory_read_tool, file_write_tool],
                     llm=llm
                 )
                 agents.append(tulpa)
