@@ -1,10 +1,13 @@
+### Imports ###
 from crewai import Agent, Task, Crew
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_community.llms import Ollama
 import getpass
 import os
 
-print("""                                             
-
+### Function to print ASCII art ###
+def print_ascii_art():
+    print("""
+                                             
  /$$$$$$$$ /$$   /$$ /$$       /$$$$$$$   /$$$$$$  /$$$$$$$$ /$$$$$$   /$$$$$$  /$$   /$$
 |__  $$__/| $$  | $$| $$      | $$__  $$ /$$__  $$|__  $$__//$$__  $$ /$$__  $$| $$  /$$/
    | $$   | $$  | $$| $$      | $$  \ $$| $$  \ $$   | $$  | $$  \ $$| $$  \__/| $$ /$$/ 
@@ -14,19 +17,15 @@ print("""
    | $$   |  $$$$$$/| $$$$$$$$| $$      | $$  | $$   | $$  | $$  | $$|  $$$$$$/| $$ \  $$
    |__/    \______/ |________/|__/      |__/  |__/   |__/  |__/  |__/ \______/ |__/  \__/
    ======================================================================================
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
-""")
+    """)
 
-llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest")
-
-if "GOOGLE_API_KEY" not in os.environ:
-    os.environ["GOOGLE_API_KEY"] = getpass.getpass("GOOGLE_API_KEY: NOT FOUND")
-
+### Function to save tulpa to file ###
 def save_tulpa(tulpa_name, tulpa_description):
     with open("SAVE.txt", "a") as file:
         file.write(f"Tulpa Name: {tulpa_name}\n")
         file.write(f"Tulpa Description: {tulpa_description}\n\n")
 
+### Function to load saved tulpas from file ###
 def load_saved_tulpas():
     saved_tulpas = []
     try:
@@ -48,11 +47,7 @@ def load_saved_tulpas():
         print("No saved tulpas found.")
     return saved_tulpas
 
-def display_saved_tulpas(saved_tulpas):
-    print("Saved Tulpas:")
-    for i, tulpa in enumerate(saved_tulpas, 1):
-        print(f"{i}. Name: {tulpa[0]}, Description: {tulpa[1]}")
-
+### Function to delete tulpa ###
 def delete_tulpa(saved_tulpas, number):
     try:
         index = int(number)
@@ -68,17 +63,7 @@ def delete_tulpa(saved_tulpas, number):
         print("Invalid input. Please provide a valid number.")
     return saved_tulpas
 
-def select_tulpa(agents):
-    print("Select a tulpa to assign the task:")
-    for i, tulpa in enumerate(agents, 1):
-        print(f"{i}. {tulpa.role}")
-    choice = int(input("Enter the number of the tulpa: "))
-    if 1 <= choice <= len(agents):
-        return agents[choice - 1]
-    else:
-        print("Invalid choice.")
-        return None
-
+### Function to create tulpa tasks ###
 def tulpa_tasks(tulpa):
     papirus_phrases = input(f"Make Task For {tulpa.role}: ")
     description = papirus_phrases
@@ -87,131 +72,133 @@ def tulpa_tasks(tulpa):
     task.agent = tulpa
     return task
 
+### Function to load tulpas ###
 def load_tulpa(saved_tulpas):
-    print("Select the number of tulpas to load as team members:")
-    display_saved_tulpas(saved_tulpas)
-    num_tulpas = int(input("Enter the number of tulpas to load: "))
-    loaded_tulpas = []
-    for _ in range(num_tulpas):
-        index = int(input("Enter the number of tulpas to load: ")) - 1
-        if 0 <= index < len(saved_tulpas):
-            loaded_tulpas.append(saved_tulpas[index])
-        else:
-            print(f"Invalid index: {index + 1}")
+    print("Selecting all loaded tulpas to include in the team.")
+    loaded_tulpas = saved_tulpas
     return loaded_tulpas
 
+
+### Function to display saved tulpas ###
+def display_saved_tulpas(saved_tulpas):
+    print("Saved Tulpas:")
+    for i, tulpa in enumerate(saved_tulpas, 1):
+        print(f"{i}. Name: {tulpa[0]}, Description: {tulpa[1]}")
+
+### Main function ###
 def main(saved_tulpas):
-    if len(saved_tulpas) >= 6:
-        print("You have reached the limit of 6 saved tulpas.")
-        return saved_tulpas
-    
-    print(" ----------------------------------")
-    print("-  1. Create New Tulpa              -")
-    print("-  2. Load Saved Tulpas as Team     -")
-    print("-  3. Exit                          -")
-    print(" ----------------------------------")
-    choice = input("Select an option: ")
+    print_ascii_art()
 
-    if choice == "1":
-        TULPA_NAME = input("Choose Name For Tulpa: ")
-        PAPIRUS = input("Create Your Tulpa Description: ")
-        save_tulpa(TULPA_NAME, PAPIRUS)
+    llm = Ollama(model="llama3")
 
-        TULPA = Agent(
-            role=TULPA_NAME,
-            goal=f"{TULPA_NAME} knows and will follow whatever his owner wants, because, {TULPA_NAME} Is An Tulpa Companion Of Owner",
-            backstory=PAPIRUS,
-            allow_delegation=True,
-            verbose=True,
-            memory=True,
-            llm=llm
-        )
-        
-        saved_tulpas.append((TULPA_NAME, PAPIRUS))
+    while True:
+        print(" ----------------------------------------")
+        print("-  1. Create New Tulpa                   -")
+        print("-  2. Load Saved Tulpas as Team          -")
+        print("-  3. Exit                               -")
+        print(" ----------------------------------------")
+        choice = input("Select an option: ")
 
-        crew = Crew(agents=[TULPA], tasks=[], verbose=1)
+        if choice == "1":
+            TULPA_NAME = input("Choose Name For Tulpa: ")
+            PAPIRUS = input("Create Your Tulpa Description: ")
+            save_tulpa(TULPA_NAME, PAPIRUS)
 
-        while True:
-            choice = input("Select An Option (1 - TASKS / 2 - DELETE TULPA / 3 - EXIT): ")
-
-            if choice == "1" or choice.lower() == "one":
-                task = tulpa_tasks(TULPA)
-                crew.tasks.append(task)
-            elif choice == "2" or choice.lower() == "two":
-                display_saved_tulpas(saved_tulpas)
-                index = int(input("Enter the number of the tulpa to delete: "))
-                saved_tulpas = delete_tulpa(saved_tulpas, index)
-            elif choice == "3" or choice.lower() == "three":
-                print(f"{TULPA_NAME} Now Is Working...")
-                break
-
-        if TULPA is not None:
-            crew.kickoff()
-
-        print(f"{TULPA_NAME} Now Is Sleeping...")
-
-    elif choice == "2":
-        loaded_tulpas = load_tulpa(saved_tulpas)
-        agents = []
-        for tulpa_name, tulpa_description in loaded_tulpas:
-            tulpa = Agent(
-                role=tulpa_name,
-                goal=f"{tulpa_name} knows and will follow whatever his owner wants, because, {tulpa_name} Is An Tulpa Companion Of Owner",
-                backstory=tulpa_description,
-                allow_delegation=False,
+            TULPA = Agent(
+                role=TULPA_NAME,
+                goal=f"{TULPA_NAME} knows and will follow whatever his owner wants, because, {TULPA_NAME} Is An Tulpa Companion Of Owner",
+                backstory=PAPIRUS,
+                allow_delegation=True,
                 verbose=True,
                 memory=True,
                 llm=llm
             )
-            agents.append(tulpa)
-        
-        print("Select tulpas to include in the team:")
-        display_saved_tulpas(saved_tulpas)
-        while True:
-            choice = input("Enter the number of the tulpa to include in the team (0 to finish): ")
-            if choice == "0":
-                break
-            index = int(choice) - 1
-            if 0 <= index < len(saved_tulpas):
-                tulpa_name, tulpa_description = saved_tulpas[index]
+
+            saved_tulpas.append((TULPA_NAME, PAPIRUS))
+
+            crew = Crew(agents=[TULPA], tasks=[], verbose=1)
+
+            while True:
+                choice = input("Select An Option (1 - TASKS / 2 - DELETE TULPA / 3 - EXIT): ")
+
+                if choice == "1" or choice.lower() == "one":
+                    task = tulpa_tasks(TULPA)
+                    crew.tasks.append(task)
+                elif choice == "2" or choice.lower() == "two":
+                    display_saved_tulpas(saved_tulpas)
+                    index = int(input("Enter the number of the tulpa to delete: "))
+                    saved_tulpas = delete_tulpa(saved_tulpas, index)
+                elif choice == "3" or choice.lower() == "three":
+                    print(f"{TULPA_NAME} Now Is Working...")
+                    break
+
+            if TULPA is not None:
+                crew.kickoff()
+
+            print(f"{TULPA_NAME} Now Is Sleeping...")
+
+        elif choice == "2":
+            loaded_tulpas = load_tulpa(saved_tulpas)
+            agents = []
+            for tulpa_name, tulpa_description in loaded_tulpas:
                 tulpa = Agent(
                     role=tulpa_name,
                     goal=f"{tulpa_name} knows and will follow whatever his owner wants, because, {tulpa_name} Is An Tulpa Companion Of Owner",
                     backstory=tulpa_description,
-                    allow_delegation=True,
+                    allow_delegation=False,
                     verbose=True,
                     memory=True,
                     llm=llm
                 )
                 agents.append(tulpa)
-            else:
-                print(f"Invalid index: {index + 1}")
 
-        crew = Crew(agents=agents, tasks=[], verbose=1)
+            print("Select tulpas to include in the team:")
+            display_saved_tulpas(saved_tulpas)
+            while True:
+                choice = input("Enter the number of the tulpa to include in the team (0 to finish): ")
+                if choice == "0":
+                    break
+                index = int(choice) - 1
+                if 0 <= index < len(saved_tulpas):
+                    tulpa_name, tulpa_description = saved_tulpas[index]
+                    tulpa = Agent(
+                        role=tulpa_name,
+                        goal=f"{tulpa_name} knows and will follow whatever his owner wants, because, {tulpa_name} Is An Tulpa Companion Of Owner",
+                        backstory=tulpa_description,
+                        allow_delegation=True,
+                        verbose=True,
+                        memory=True,
+                        llm=llm
+                    )
+                    agents.append(tulpa)
+                else:
+                    print(f"Invalid index: {index + 1}")
 
-        while True:
-            choice = input("Select An Option (1 - TASKS / 2 - DELETE TULPA / 3 - EXIT): ")
+            crew = Crew(agents=agents, tasks=[], verbose=1)
 
-            if choice == "1" or choice.lower() == "one":
-                for tulpa in agents:
-                    task = tulpa_tasks(tulpa)
-                    crew.tasks.append(task)
-            elif choice == "2" or choice.lower() == "two":
-                display_saved_tulpas(saved_tulpas)
-                index = int(input("Enter the number of the tulpa to delete: "))
-                saved_tulpas = delete_tulpa(saved_tulpas, index)
-            elif choice == "3" or choice.lower() == "three":
-                print("Tulpa Team is now working...")
-                break
+            while True:
+                choice = input("Select An Option (1 - TASKS / 2 - DELETE TULPA / 3 - EXIT): ")
 
-        crew.kickoff()
+                if choice == "1" or choice.lower() == "one":
+                    for tulpa in agents:
+                        task = tulpa_tasks(tulpa)
+                        crew.tasks.append(task)
+                elif choice == "2" or choice.lower() == "two":
+                    display_saved_tulpas(saved_tulpas)
+                    index = int(input("Enter the number of the tulpa to delete: "))
+                    saved_tulpas = delete_tulpa(saved_tulpas, index)
+                elif choice == "3" or choice.lower() == "three":
+                    print("Tulpa Team is now working...")
+                    break
 
-        print("Tulpa Team is now sleeping...")
-        
-    elif choice == "3":
-        pass
-    else:
-        print("Invalid choice")
+            crew.kickoff()
+
+            print("Tulpa Team is now sleeping...")
+
+        elif choice == "3":
+            break
+        else:
+            print("Invalid choice")
 
     return saved_tulpas
 
