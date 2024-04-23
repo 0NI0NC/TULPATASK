@@ -106,7 +106,7 @@ def main(saved_tulpas):
         return saved_tulpas
     
     print(" ----------------------------------")
-    print("-  1. Create New Tulpa             -")
+    print("-  1. Create New Tulpa              -")
     print("-  2. Load Saved Tulpas as Team     -")
     print("-  3. Exit                          -")
     print(" ----------------------------------")
@@ -176,7 +176,7 @@ def main(saved_tulpas):
                     role=tulpa_name,
                     goal=f"{tulpa_name} knows and will follow whatever his owner wants, because, {tulpa_name} Is An Tulpa Companion Of Owner",
                     backstory=tulpa_description,
-                    allow_delegation=True,
+                    allow_delegation=False,
                     verbose=True,
                     llm=llm
                 )
