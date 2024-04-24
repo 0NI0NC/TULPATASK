@@ -5,6 +5,7 @@ from functools import wraps
 import getpass
 import os
 import cProfile
+import time
 
 ### Function to print ASCII art ###
 def print_ascii_art():
@@ -24,7 +25,7 @@ def print_ascii_art():
 ### Delay Function ###
 def delay(seconds):
     print(f"Waiting for {seconds} seconds...")
-    time.sleep(seconds)
+    time.sleep(seconds) 
 
 ### Profiling decorator ###
 def profile(func):
@@ -58,7 +59,6 @@ def load_saved_tulpas():
                     saved_tulpas.append((tulpa_name, tulpa_description))
                     i += 2
                 else:
-                    print("Incomplete entry in SAVE.txt")
                     i += 1 
     except FileNotFoundError:
         print("No saved tulpas found.")
@@ -94,13 +94,24 @@ def tulpa_tasks(agents):
                 break
             except ValueError:
                 print("Invalid input. Please provide a valid number.")
+        
+        ### Collect task descriptions ###
+        task_descriptions = []
         for _ in range(num_tasks):
             papirus_phrases = input(f"Task for {agent.role}: ")
             description = papirus_phrases
-            expected_output = ""
-            task = Task(description=description, expected_output=expected_output)
-            task.agent = agent
-            tasks.append(task)
+            task_descriptions.append(description)
+
+        ### Batch tasks ###
+        batch_size = 5 
+        for i in range(0, len(task_descriptions), batch_size):
+            batch_descriptions = task_descriptions[i:i+batch_size]
+            batch_expected_output = [""] * len(batch_descriptions)
+            batch_tasks = [Task(description=desc, expected_output=output) for desc, output in zip(batch_descriptions, batch_expected_output)]
+            for task in batch_tasks:
+                task.agent = agent
+            tasks.extend(batch_tasks)
+            
     return tasks
 
 ### Function to load tulpas ###
