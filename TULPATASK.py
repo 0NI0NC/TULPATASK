@@ -1,5 +1,5 @@
 ### Imports ###
-from crewai import Agent, Task, Crew
+from crewai import Agent, Task, Crew, Process
 from langchain_google_genai import ChatGoogleGenerativeAI
 from functools import wraps
 import getpass
@@ -210,7 +210,8 @@ def main(saved_tulpas):
                         allow_delegation=True,
                         verbose=True,
                         memory=True,
-                        llm=llm
+                        process=Process.hierarchical,  
+                        manager_llm=llm
                     )
                     agents.append(tulpa)
                 else:
