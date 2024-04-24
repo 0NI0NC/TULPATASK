@@ -21,6 +21,11 @@ def print_ascii_art():
     "   ======================================================================================\n"
 )
 
+### Delay Function ###
+def delay(seconds):
+    print(f"Waiting for {seconds} seconds...")
+    time.sleep(seconds)
+
 ### Profiling decorator ###
 def profile(func):
     @wraps(func)
@@ -217,6 +222,7 @@ def main(saved_tulpas):
                     break
 
             crew.kickoff()
+            delay(2)
 
             print("Tulpa Team is now sleeping...")
 
