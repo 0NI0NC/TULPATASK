@@ -1,8 +1,10 @@
 ### Imports ###
 from crewai import Agent, Task, Crew
-from langchain_community.llms import Ollama
+from langchain_google_genai import ChatGoogleGenerativeAI
+from functools import wraps
 import getpass
 import os
+import cProfile
 
 ### Function to print ASCII art ###
 def print_ascii_art():
@@ -19,6 +21,18 @@ def print_ascii_art():
     "   ======================================================================================\n"
 )
 
+### Profiling decorator ###
+def profile(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        profiler = cProfile.Profile()
+        profiler.enable()
+        result = func(*args, **kwargs)
+        profiler.disable()
+        profiler.print_stats(sort="cumulative")
+        return result
+    return wrapper
+
 ### Function to save tulpa to file ###
 def save_tulpa(tulpa_name, tulpa_description):
     with open("SAVE.txt", "a") as file:
@@ -31,28 +45,26 @@ def load_saved_tulpas():
     try:
         with open("SAVE.txt", "r") as file:
             lines = file.readlines()
-            tulpa_name = None
-            tulpa_description = None
-            for line in lines:
-                line = line.strip()
-                if line.startswith("Tulpa Name:"):
-                    if tulpa_name and tulpa_description:
-                        saved_tulpas.append((tulpa_name, tulpa_description))
-                    tulpa_name = line.split(": ")[1].strip()
-                elif line.startswith("Tulpa Description:"):
-                    tulpa_description = line.split(": ")[1].strip()
-            if tulpa_name and tulpa_description:
-                saved_tulpas.append((tulpa_name, tulpa_description))
+            i = 0
+            while i < len(lines):
+                if lines[i].startswith("Tulpa Name:") and i + 1 < len(lines) and lines[i + 1].startswith("Tulpa Description:"):
+                    tulpa_name = lines[i].split(": ")[1].strip()
+                    tulpa_description = lines[i + 1].split(": ")[1].strip()
+                    saved_tulpas.append((tulpa_name, tulpa_description))
+                    i += 2
+                else:
+                    print("Incomplete entry in SAVE.txt")
+                    i += 1 
     except FileNotFoundError:
         print("No saved tulpas found.")
     return saved_tulpas
-
+    
 ### Function to delete tulpa ###
 def delete_tulpa(saved_tulpas, number):
     try:
         index = int(number)
         if 1 <= index <= len(saved_tulpas):
-            del saved_tulpas[index - 1]
+            saved_tulpas.pop(index - 1)
             with open("SAVE.txt", "w") as file:
                 for tulpa in saved_tulpas:
                     file.write(f"Tulpa Name: {tulpa[0]}\n")
@@ -64,20 +76,33 @@ def delete_tulpa(saved_tulpas, number):
     return saved_tulpas
 
 ### Function to create tulpa tasks ###
-def tulpa_tasks(tulpa):
-    papirus_phrases = input(f"Make Task For {tulpa.role}: ")
-    description = papirus_phrases
-    expected_output = ""
-    task = Task(description=description, expected_output=expected_output)
-    task.agent = tulpa
-    return task
+def tulpa_tasks(agents):
+    tasks = []
+    for agent in agents:
+        while True:
+            num_tasks_str = input(f"Enter the number of tasks for {agent.role}: ")
+            if len(num_tasks_str) > 1000000000:
+                print("Input too long. Please provide a shorter input.")
+                continue
+            try:
+                num_tasks = int(num_tasks_str)
+                break
+            except ValueError:
+                print("Invalid input. Please provide a valid number.")
+        for _ in range(num_tasks):
+            papirus_phrases = input(f"Task for {agent.role}: ")
+            description = papirus_phrases
+            expected_output = ""
+            task = Task(description=description, expected_output=expected_output)
+            task.agent = agent
+            tasks.append(task)
+    return tasks
 
 ### Function to load tulpas ###
 def load_tulpa(saved_tulpas):
     print("Selecting all loaded tulpas to include in the team.")
     loaded_tulpas = saved_tulpas
     return loaded_tulpas
-
 
 ### Function to display saved tulpas ###
 def display_saved_tulpas(saved_tulpas):
@@ -86,10 +111,11 @@ def display_saved_tulpas(saved_tulpas):
         print(f"{i}. Name: {tulpa[0]}, Description: {tulpa[1]}")
 
 ### Main function ###
+@profile
 def main(saved_tulpas):
     print_ascii_art()
 
-    llm = Ollama(model="gemma:2b-instruct-v1.1-q2_K")
+    llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest")
 
     while True:
         print(" ----------------------------------------")
@@ -122,8 +148,8 @@ def main(saved_tulpas):
                 choice = input("Select An Option (1 - TASKS / 2 - DELETE TULPA / 3 - EXIT): ")
 
                 if choice == "1" or choice.lower() == "one":
-                    task = tulpa_tasks(TULPA)
-                    crew.tasks.append(task)
+                    tasks = tulpa_tasks([TULPA])
+                    crew.tasks.extend(tasks)
                 elif choice == "2" or choice.lower() == "two":
                     display_saved_tulpas(saved_tulpas)
                     index = int(input("Enter the number of the tulpa to delete: "))
@@ -180,9 +206,8 @@ def main(saved_tulpas):
                 choice = input("Select An Option (1 - TASKS / 2 - DELETE TULPA / 3 - EXIT): ")
 
                 if choice == "1" or choice.lower() == "one":
-                    for tulpa in agents:
-                        task = tulpa_tasks(tulpa)
-                        crew.tasks.append(task)
+                    tasks = tulpa_tasks(agents)
+                    crew.tasks.extend(tasks)
                 elif choice == "2" or choice.lower() == "two":
                     display_saved_tulpas(saved_tulpas)
                     index = int(input("Enter the number of the tulpa to delete: "))
