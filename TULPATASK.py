@@ -131,7 +131,7 @@ def display_saved_tulpas(saved_tulpas):
 def main(saved_tulpas):
     print_ascii_art()
 
-    llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest")
+    llm = ChatGoogleGenerativeAI(model="gemini-1.0-pro")
 
     while True:
         print(" ----------------------------------------")
