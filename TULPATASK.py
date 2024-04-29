@@ -1,6 +1,9 @@
 ### Imports ###
 from crewai import Agent, Task, Crew, Process
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_community.tools import ShellTool, WikipediaQueryRun, DuckDuckGoSearchRun
+from langchain.agents import Tool
+from langchain_community.utilities import WikipediaAPIWrapper, PythonREPL
 from functools import wraps
 import getpass
 import os
@@ -20,6 +23,14 @@ def print_ascii_art():
     "   | $$   |  $$$$$$/| $$$$$$$$| $$      | $$  | $$   | $$  | $$  | $$|  $$$$$$/| $$ \\  $$\n"
     "   |__/    \\______/ |________/|__/      |__/  |__/   |__/  |__/  |__/ \\______/ |__/  \\__/\n"
     "   ======================================================================================\n"
+)
+
+search_tool = DuckDuckGoSearchRun()
+wikipedia_tool = WikipediaQueryRun(api_wrapper=WikipediaAPIWrapper())
+repl_tool = Tool(
+    name="python_repl",
+    description="A Python shell. Use this to execute python commands. Input should be a valid python command. If you want to see the output of a value, you should print it out with `print(...)` but remember, you can make any python code using this shell.",
+    func=PythonREPL.run,
 )
 
 ### Delay Function ###
@@ -153,7 +164,8 @@ def main(saved_tulpas):
                 allow_delegation=True,
                 verbose=True,
                 memory=True,
-                llm=llm
+                llm=llm,
+                tools=[search_tool, wikipedia_tool, repl_tool]
             )
 
             saved_tulpas.append((TULPA_NAME, PAPIRUS))
@@ -190,7 +202,8 @@ def main(saved_tulpas):
                     allow_delegation=True,
                     verbose=True,
                     memory=True,
-                    llm=llm
+                    llm=llm,
+                    tools=[search_tool, wikipedia_tool, repl_tool]
                 )
                 agents.append(tulpa)
 
@@ -210,8 +223,8 @@ def main(saved_tulpas):
                         allow_delegation=True,
                         verbose=True,
                         memory=True,
-                        process=Process.hierarchical,  
-                        manager_llm=llm
+                        llm=llm,
+                        tools=[search_tool, wikipedia_tool, repl_tool]
                     )
                     agents.append(tulpa)
                 else:
