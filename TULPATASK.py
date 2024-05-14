@@ -1,9 +1,8 @@
 ### Imports ###
 from crewai import Agent, Task, Crew, Process
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_community.tools import ShellTool, WikipediaQueryRun, DuckDuckGoSearchRun
-from langchain.agents import Tool
-from langchain_community.utilities import WikipediaAPIWrapper, PythonREPL
+from langchain_community.llms import Ollama
+from langchain_community.tools import WikipediaQueryRun, DuckDuckGoSearchRun
+from langchain_community.utilities import WikipediaAPIWrapper
 from functools import wraps
 import getpass
 import os
@@ -27,11 +26,6 @@ def print_ascii_art():
 
 search_tool = DuckDuckGoSearchRun()
 wikipedia_tool = WikipediaQueryRun(api_wrapper=WikipediaAPIWrapper())
-repl_tool = Tool(
-    name="python_repl",
-    description="A Python shell. Use this to execute python commands. Input should be a valid python command. If you want to see the output of a value, you should print it out with `print(...)` but remember, you can make any python code using this shell.",
-    func=PythonREPL.run,
-)
 
 ### Delay Function ###
 def delay(seconds):
@@ -142,7 +136,7 @@ def display_saved_tulpas(saved_tulpas):
 def main(saved_tulpas):
     print_ascii_art()
 
-    llm = ChatGoogleGenerativeAI(model="gemini-1.0-pro")
+    llm = Ollama(model="qwen:0.5b")
 
     while True:
         print(" ----------------------------------------")
