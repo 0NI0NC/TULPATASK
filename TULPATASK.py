@@ -1,29 +1,24 @@
 ### Imports ###
-from crewai import Agent, Task, Crew, Process
+from crewai import Agent, Task, Crew
 from langchain_community.llms import Ollama
 from langchain_community.tools import WikipediaQueryRun, DuckDuckGoSearchRun
 from langchain_community.utilities import WikipediaAPIWrapper
 from functools import wraps
-import getpass
-import os
 import cProfile
 import time
 
 ### Function to print ASCII art ###
 def print_ascii_art():
-    print(
-    "                                             \n"
-    " /$$$$$$$$ /$$   /$$ /$$       /$$$$$$$   /$$$$$$  /$$$$$$$$ /$$$$$$   /$$$$$$  /$$   /$$\n"
-    "|__  $$__/| $$  | $$| $$      | $$__  $$ /$$__  $$|__  $$__//$$__  $$ /$$__  $$| $$  /$$/\n"
-    "   | $$   | $$  | $$| $$      | $$  \\ $$| $$  \\ $$   | $$  | $$  \\ $$| $$  \\__/| $$ /$$/ \n"
-    "   | $$   | $$  | $$| $$      | $$$$$$$/| $$$$$$$$   | $$  | $$$$$$$$|  $$$$$$ | $$$$$/  \n"
-    "   | $$   | $$  | $$| $$      | $$____/ | $$__  $$   | $$  | $$__  $$ \\____  $$| $$  $$  \n"
-    "   | $$   | $$  | $$| $$      | $$      | $$  | $$   | $$  | $$  | $$ /$$  \\ $$| $$\\  $$  \n"
-    "   | $$   |  $$$$$$/| $$$$$$$$| $$      | $$  | $$   | $$  | $$  | $$|  $$$$$$/| $$ \\  $$\n"
-    "   |__/    \\______/ |________/|__/      |__/  |__/   |__/  |__/  |__/ \\______/ |__/  \\__/\n"
-    "   ======================================================================================\n"
-)
-
+    print(r""" 
+$$$$$$$$\ $$\   $$\ $$\       $$$$$$$\   $$$$$$\ $$$$$$$$\  $$$$$$\   $$$$$$\  $$\   $$\ 
+\__$$  __|$$ |  $$ |$$ |      $$  __$$\ $$  __$$\\__$$  __|$$  __$$\ $$  __$$\ $$ | $$  |
+   $$ |   $$ |  $$ |$$ |      $$ |  $$ |$$ /  $$ |  $$ |   $$ /  $$ |$$ /  \__|$$ |$$  / 
+   $$ |   $$ |  $$ |$$ |      $$$$$$$  |$$$$$$$$ |  $$ |   $$$$$$$$ |\$$$$$$\  $$$$$  /  
+   $$ |   $$ |  $$ |$$ |      $$  ____/ $$  __$$ |  $$ |   $$  __$$ | \____$$\ $$  $$<   
+   $$ |   $$ |  $$ |$$ |      $$ |      $$ |  $$ |  $$ |   $$ |  $$ |$$\   $$ |$$ |\$$\  
+   $$ |   \$$$$$$  |$$$$$$$$\ $$ |      $$ |  $$ |  $$ |   $$ |  $$ |\$$$$$$  |$$ | \$$\ 
+   \__|    \______/ \________|\__|      \__|  \__|  \__|   \__|  \__| \______/ \__|  \__|
+                                                        """)                                                                            
 search_tool = DuckDuckGoSearchRun()
 wikipedia_tool = WikipediaQueryRun(api_wrapper=WikipediaAPIWrapper())
 
@@ -146,7 +141,7 @@ def main(saved_tulpas):
         print(" ----------------------------------------")
         choice = input("Select an option: ")
 
-        if choice == "1":
+        if choice == "1" or choice.lower() == "one":
             TULPA_NAME = input("Choose Name For Tulpa: ")
             PAPIRUS = input("Create Your Tulpa Description: ")
             save_tulpa(TULPA_NAME, PAPIRUS)
@@ -185,7 +180,7 @@ def main(saved_tulpas):
 
             print(f"{TULPA_NAME} Now Is Sleeping...")
 
-        elif choice == "2":
+        elif choice == "2" or choice.lower() == "two":
             loaded_tulpas = load_tulpa(saved_tulpas)
             agents = []
             for tulpa_name, tulpa_description in loaded_tulpas:
