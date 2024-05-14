@@ -159,7 +159,7 @@ def main(saved_tulpas):
                 verbose=True,
                 memory=True,
                 llm=llm,
-                tools=[search_tool, wikipedia_tool, repl_tool]
+                tools=[search_tool, wikipedia_tool]
             )
 
             saved_tulpas.append((TULPA_NAME, PAPIRUS))
@@ -197,7 +197,7 @@ def main(saved_tulpas):
                     verbose=True,
                     memory=True,
                     llm=llm,
-                    tools=[search_tool, wikipedia_tool, repl_tool]
+                    tools=[search_tool, wikipedia_tool]
                 )
                 agents.append(tulpa)
 
@@ -218,7 +218,7 @@ def main(saved_tulpas):
                         verbose=True,
                         memory=True,
                         llm=llm,
-                        tools=[search_tool, wikipedia_tool, repl_tool]
+                        tools=[search_tool, wikipedia_tool]
                     )
                     agents.append(tulpa)
                 else:
