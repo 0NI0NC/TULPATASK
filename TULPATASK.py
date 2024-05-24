@@ -1,11 +1,13 @@
 ### Imports ###
 from crewai import Agent, Task, Crew
-from langchain_community.llms import Ollama
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.tools import WikipediaQueryRun, DuckDuckGoSearchRun
 from langchain_community.utilities import WikipediaAPIWrapper
 from functools import wraps
 import cProfile
 import time
+import getpass
+import os
 
 ### Function to print ASCII art ###
 def print_ascii_art():
@@ -131,8 +133,11 @@ def display_saved_tulpas(saved_tulpas):
 def main(saved_tulpas):
     print_ascii_art()
 
-    llm = Ollama(model="qwen:0.5b")
-
+    if "GOOGLE_API_KEY" not in os.environ:
+    os.environ["GOOGLE_API_KEY"] = getpass.getpass("GOOGLE_API_KEY: NOT FOUND")
+    
+    llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash")
+    
     while True:
         print(" ----------------------------------------")
         print("-  1. Create New Tulpa                   -")
